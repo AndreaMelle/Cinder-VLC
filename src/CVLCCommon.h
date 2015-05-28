@@ -54,6 +54,9 @@ namespace cvlc
 		libvlc_event_attach(eventManager, eventType, handle_vlc_event, responder);
 	}
 
+	
+
+
 };
 
 #endif //__CVLC_COMMON_H__

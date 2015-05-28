@@ -2,6 +2,42 @@
 
 using namespace cvlc;
 
+libvlc_instance_t* MoviePlayer::libvlc = NULL;
+bool MoviePlayer::initialized = false;
+
+void MoviePlayer::startVLC()
+{
+	if (initialized)
+		return;
+
+	char const *vlc_argv[] = {
+		"-I", "dumy",      // No special interface
+		"--ignore-config", // Don't use VLC's config
+		"--no-audio",
+		"--no-xlib",
+		"--plugin-path=./plugins",
+		//"--video-filter", "sepia",
+		//"--sepia-intensity=200"
+	};
+
+	int vlc_argc = sizeof(vlc_argv) / sizeof(*vlc_argv);
+
+	libvlc = libvlc_new(vlc_argc, vlc_argv);
+
+	if (NULL == libvlc)
+	{
+		throw "LibVLC initialization failure";
+	}
+
+	initialized = true;
+}
+
+void MoviePlayer::stopVLC()
+{
+	libvlc_release(libvlc);
+	initialized = false;
+}
+
 MoviePlayer::MoviePlayer(const ci::fs::path &path) :
 hasNewFrame(false),
 mVideoTextureRef(NULL),
@@ -16,28 +52,9 @@ mFrameCount(0),
 mPlayingForward(true),
 mLoop(false)
 {
-	mWidth = 1920;
-	mHeight = 1080;
+	MoviePlayer::startVLC();
+
 	int bpp = 4;
-
-	char const *vlc_argv[] = {
-		"-I", "dumy",      // No special interface
-		"--ignore-config", // Don't use VLC's config
-		"--no-audio",
-		"--no-xlib",
-		"--plugin-path=./plugins",
-		"--video-filter", "sepia",
-		"--sepia-intensity=200"
-	};
-
-	int vlc_argc = sizeof(vlc_argv) / sizeof(*vlc_argv);
-
-	libvlc = libvlc_new(vlc_argc, vlc_argv);
-
-	if (NULL == libvlc)
-	{
-		throw "LibVLC initialization failure";
-	}
 
 	std::string moviePathStr = path.string();
 	libvlc_media_t *media;
@@ -140,8 +157,6 @@ MoviePlayer::~MoviePlayer()
 
 	libvlc_media_list_release(medialist);
 	libvlc_media_list_player_release(medialistplayer);
-
-	libvlc_release(libvlc);
 
 	glDeleteTextures(1, &mTexture);
 

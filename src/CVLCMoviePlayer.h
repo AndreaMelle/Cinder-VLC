@@ -86,6 +86,8 @@ namespace cvlc
 
 	private:
 		MoviePlayer();
+		static void startVLC();
+		static void stopVLC();
 
 		GLuint mTexture;
 		ci::gl::TextureRef mVideoTextureRef;
@@ -110,13 +112,14 @@ namespace cvlc
 		bool hasNewFrame;
 		bool mIsDone;
 		
-		libvlc_instance_t *libvlc;
+		static libvlc_instance_t *libvlc;
+		static bool initialized;
+
 		libvlc_media_player_t *mediaplayer;
 		libvlc_media_list_player_t *medialistplayer;
 		libvlc_media_list_t *medialist;
 		libvlc_event_manager_t* eventManager;
 	};
-
 };
 
 
