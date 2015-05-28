@@ -12,4 +12,4 @@ Cinder wrapper for VLC (Windows 32-bit only)
 Add post build script to copy content of vlc_bin folder
 
 ## Authors and contributors
-* [Andrea Melle](andrea.melle@happyfinish.com) (Creator, developer)
+* [Andrea Melle](https://github.com/andreamellehf) (Creator, developer)
