@@ -65,6 +65,8 @@ mLoop(false)
 	
 	libvlc_media_parse(media);
 
+	mDuration = libvlc_media_get_duration(media);
+
 	libvlc_media_track_t** tracks = NULL;
 	unsigned int track_count = libvlc_media_tracks_get(media, &tracks);
 
@@ -79,6 +81,7 @@ mLoop(false)
 				libvlc_video_track_t* videoTrack = track->video;
 				mWidth = videoTrack->i_width;
 				mHeight= videoTrack->i_height;
+				
 			}
 		}
 	}
