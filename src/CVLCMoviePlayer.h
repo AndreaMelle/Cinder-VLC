@@ -46,7 +46,7 @@ namespace cvlc
 		//TODO: don't know how to get this info from VLC
 		float getPixelAspectRatio() const { return 1.0f;  }
 		//! Returns the movie's length measured in seconds
-		float getDuration() const { return mDuration; }
+		float getDuration() const;
 		//! Returns the movie's framerate measured as frames per second
 		float getFramerate() const;
 		//! Returns the total number of frames (video samples) in the movie
@@ -100,20 +100,22 @@ namespace cvlc
 		uint32_t mWidth;
 		uint32_t mHeight;
 		int32_t mFrameCount;
-		float mDuration;
-		bool mLoaded;
-		bool mPlayable;
-		bool mPausable;
-		bool mSeekable;
-		bool mPlayingForward, mLoop;
+		//int64_t mDuration;
+		std::atomic<int64_t> mDuration;
+		std::atomic<bool> mLoaded;
+		std::atomic<bool> mPlayable;
+		std::atomic<bool> mPausable;
+		std::atomic<bool> mSeekable;
+		std::atomic<bool> mPlayingForward;
+		std::atomic<bool> mLoop;
 
 		std::mutex mMutex;
 		uint8_t* mDataSource;
-		bool hasNewFrame;
-		bool mIsDone;
+		std::atomic<bool> hasNewFrame;
+		std::atomic<bool> mIsDone;
 		
 		static libvlc_instance_t *libvlc;
-		static bool initialized;
+		static std::atomic<int> initialized;
 
 		libvlc_media_player_t *mediaplayer;
 		libvlc_media_list_player_t *medialistplayer;

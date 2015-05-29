@@ -3,39 +3,44 @@
 using namespace cvlc;
 
 libvlc_instance_t* MoviePlayer::libvlc = NULL;
-bool MoviePlayer::initialized = false;
+std::atomic<int> MoviePlayer::initialized = 0;
 
 void MoviePlayer::startVLC()
 {
-	if (initialized)
-		return;
-
-	char const *vlc_argv[] = {
-		"-I", "dumy",      // No special interface
-		"--ignore-config", // Don't use VLC's config
-		"--no-audio",
-		"--no-xlib",
-		"--plugin-path=./plugins",
-		//"--video-filter", "sepia",
-		//"--sepia-intensity=200"
-	};
-
-	int vlc_argc = sizeof(vlc_argv) / sizeof(*vlc_argv);
-
-	libvlc = libvlc_new(vlc_argc, vlc_argv);
-
-	if (NULL == libvlc)
+	if (initialized == 0)
 	{
-		throw "LibVLC initialization failure";
+		char const *vlc_argv[] = {
+			"-I", "dumy",      // No special interface
+			"--ignore-config", // Don't use VLC's config
+			"--no-audio",
+			"--no-xlib",
+			"--plugin-path=./plugins",
+			//"--video-filter", "sepia",
+			//"--sepia-intensity=200"
+		};
+
+		int vlc_argc = sizeof(vlc_argv) / sizeof(*vlc_argv);
+
+		libvlc = libvlc_new(vlc_argc, vlc_argv);
+
+		if (NULL == libvlc)
+		{
+			throw "LibVLC initialization failure";
+		}
 	}
 
-	initialized = true;
+	initialized++;
 }
 
 void MoviePlayer::stopVLC()
 {
-	libvlc_release(libvlc);
-	initialized = false;
+	initialized--;
+
+	if (initialized <= 0)
+	{
+		libvlc_release(libvlc);
+		initialized = 0;
+	}	
 }
 
 MoviePlayer::MoviePlayer(const ci::fs::path &path) :
@@ -54,13 +59,10 @@ mLoop(false)
 {
 	MoviePlayer::startVLC();
 
-	int bpp = 4;
-
 	std::string moviePathStr = path.string();
 	libvlc_media_t *media;
 	media = libvlc_media_new_path(libvlc, moviePathStr.c_str());
 	
-	// query media information - sync
 	libvlc_media_parse(media);
 
 	libvlc_media_track_t** tracks = NULL;
@@ -97,7 +99,7 @@ mLoop(false)
 	libvlc_media_release(media);
 
 	SetVideoCallbacks(mediaplayer, this);
-	libvlc_video_set_format(mediaplayer, "RGBA", mWidth, mHeight, mWidth * bpp); //RV16	
+	libvlc_video_set_format(mediaplayer, "RGBA", mWidth, mHeight, mWidth * 4); //RV16	
 
 	eventManager = libvlc_media_player_event_manager(mediaplayer);
 
@@ -125,9 +127,6 @@ mLoop(false)
 	//libvlc_MediaPlayerESDeleted
 	//libvlc_MediaPlayerESSelected
 	
-
-	// BEGIN - create a texture for video.
-
 	mDataSource = new BYTE[mWidth * mHeight * 4 * sizeof(BYTE)];
 	memset(mDataSource, 0, mWidth * mHeight * 4 * sizeof(BYTE));
 
@@ -144,8 +143,6 @@ mLoop(false)
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	mVideoTextureRef = ci::gl::Texture::create(GL_TEXTURE_2D, mTexture, mWidth, mHeight, true);
-
-	// END - create texture for video
 
 	mLoaded = true;
 }
@@ -165,6 +162,8 @@ MoviePlayer::~MoviePlayer()
 		delete[] mDataSource;
 		mDataSource = NULL;
 	}
+
+	MoviePlayer::stopVLC();
 }
 
 void MoviePlayer::setLoop(bool loop)
@@ -308,13 +307,18 @@ void MoviePlayer::handle_vlc_event(const struct libvlc_event_t* evt)
 	else if (e == (int)libvlc_MediaPlayerLengthChanged)
 	{
 		libvlc_time_t duration_ms = libvlc_media_player_get_length(mediaplayer);
-		mDuration = (float)duration_ms * MILLISEC_TO_SEC;
-		mFrameCount = (int32_t)std::floorf(mDuration * this->getFramerate());
+		mDuration = duration_ms;
+		mFrameCount = (int32_t)std::floorf(mDuration * MILLISEC_TO_SEC * this->getFramerate());
 	}
 	else if (e == (int)libvlc_MediaPlayerSeekableChanged)
 	{
 
 	}
+}
+
+float MoviePlayer::getDuration() const
+{
+	return ((float)mDuration * MILLISEC_TO_SEC);
 }
 
 void* MoviePlayer::lock(void **p_pixels)
