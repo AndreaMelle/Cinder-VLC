@@ -3,7 +3,7 @@
 Cinder wrapper for VLC (Windows 32-bit only)
 
 Note: compared to QuickTime, VLC cannot play media backwards (i.e. setting the rate to -1.0 will have no effect).
-This is a known (https://forum.videolan.org/viewtopic.php?t=70191) technical limitation, therefore it's necessary to prepare backward versions of each clip we want to reverse.
+This is a known (https://forum.videolan.org/viewtopic.php?t=70191) technical limitation.
 
 ## Instructions
 
