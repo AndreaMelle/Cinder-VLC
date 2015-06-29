@@ -80,7 +80,7 @@ void SimplePlaybackApp::prepareSettings(Settings* settings)
 	settings->prepareWindow(Window::Format().size(width, height)
 		.title("Video Sample")
 		.borderless(true)
-		.pos(-width, 0));
+		.pos(0, 0));
 	settings->setFrameRate(60.0f);
 
 }
