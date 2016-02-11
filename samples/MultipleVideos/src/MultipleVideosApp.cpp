@@ -1,5 +1,5 @@
-#include "cinder/app/AppNative.h"
-#include "cinder/gl/gl.h"
+#include "cinder/app/App.h"
+#include "cinder/app/RendererGl.h"
 #include "cinder\gl\Texture.h"
 #include "CVLCMoviePlayer.h"
 
@@ -7,7 +7,7 @@ using namespace ci;
 using namespace ci::app;
 using namespace std;
 
-class SimplePlaybackApp : public AppNative
+class MultipleVideosApp : public App
 {
   public:
 	void setup();
@@ -15,7 +15,6 @@ class SimplePlaybackApp : public AppNative
 	void keyDown(KeyEvent evt);
 	void update();
 	void draw();
-	void prepareSettings(Settings* settings);
 	void shutdown();
 
 private:
@@ -25,12 +24,12 @@ private:
 
 };
 
-void SimplePlaybackApp::shutdown()
+void MultipleVideosApp::shutdown()
 {
 
 }
 
-void SimplePlaybackApp::setup()
+void MultipleVideosApp::setup()
 {
 	fs::path moviePath1 = app::getAssetPath("trailer_short_colorized.mp4");
 	fs::path moviePath2 = app::getAssetPath("trailer_short.mp4");
@@ -45,11 +44,11 @@ void SimplePlaybackApp::setup()
 	moviePlayer2->play();
 }
 
-void SimplePlaybackApp::mouseDown( MouseEvent event )
+void MultipleVideosApp::mouseDown(MouseEvent event)
 {
 }
 
-void SimplePlaybackApp::keyDown(KeyEvent evt)
+void MultipleVideosApp::keyDown(KeyEvent evt)
 {
 	if (evt.getCode() == KeyEvent::KEY_SPACE)
 	{
@@ -62,12 +61,12 @@ void SimplePlaybackApp::keyDown(KeyEvent evt)
 	}
 }
 
-void SimplePlaybackApp::update()
+void MultipleVideosApp::update()
 {
 
 }
 
-void SimplePlaybackApp::draw()
+void MultipleVideosApp::draw()
 {
 	gl::clear( Color( 0, 0, 0 ) );
 
@@ -92,19 +91,4 @@ void SimplePlaybackApp::draw()
 	gl::popMatrices();
 }
 
-void SimplePlaybackApp::prepareSettings(Settings* settings)
-{
-	float mGlobalScale = 1.0f;
-
-	int32_t width = static_cast<int32_t>(1920.0f * mGlobalScale);
-	int32_t height = (int32_t)((float)width * 9.0f / 16.0f);
-
-	settings->prepareWindow(Window::Format().size(width, height)
-		.title("Video Sample")
-		.borderless(true)
-		.pos(0, 0));
-	settings->setFrameRate(60.0f);
-
-}
-
-CINDER_APP_NATIVE( SimplePlaybackApp, RendererGl )
+CINDER_APP(MultipleVideosApp, RendererGl)
