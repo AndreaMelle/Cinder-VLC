@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<cinder>
+<block
+	name="Cinder-VLC"
+	id="org.andreamelle.cindervlc"
+	author="Andrea Melle"
+	license="BSD"
+	summary="Wrapper of VLC libraries to play video on Windows with Cinder"
+	git="git://github.com/AndreaMelle/Cinder-VLC"
+	version="0.1.0"
+	libraryUrl="http://www.videolan.org/vlc/libvlc.html"
+	>
+	<header>include/CVLCMoviePlayer.h</header>
+	<header>include/CVLCCommon.h</header>
+	<includePath>include/vlc</includePath>
+	<includePath>include</includePath>
+	<platform compiler="vc2013">
+		<platform config="debug">
+			<staticLibrary>lib/vc2013/x86/libvlc.lib</staticLibrary>
+			<staticLibrary>lib/vc2013/x86/libvlccore.lib</staticLibrary>
+			<staticLibrary>lib/vc2013/x64/libvlc.lib</staticLibrary>
+			<staticLibrary>lib/vc2013/x64/libvlccore.lib</staticLibrary>
+		</platform>
+		<platform config="release">
+			<staticLibrary>lib/vc2013/x86/libvlc.lib</staticLibrary>
+			<staticLibrary>lib/vc2013/x86/libvlccore.lib</staticLibrary>
+			<staticLibrary>lib/vc2013/x64/libvlc.lib</staticLibrary>
+			<staticLibrary>lib/vc2013/x64/libvlccore.lib</staticLibrary>
+		</platform>
+	</platform>
+</block>
+</cinder>

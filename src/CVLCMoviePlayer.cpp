@@ -130,8 +130,8 @@ mLoop(false)
 	//libvlc_MediaPlayerESDeleted
 	//libvlc_MediaPlayerESSelected
 	
-	mDataSource = new BYTE[mWidth * mHeight * 4 * sizeof(BYTE)];
-	memset(mDataSource, 0, mWidth * mHeight * 4 * sizeof(BYTE));
+	mDataSource = new uint8_t[mWidth * mHeight * 4 * sizeof(uint8_t)];
+	memset(mDataSource, 0, mWidth * mHeight * 4 * sizeof(uint8_t));
 
 	glGenTextures(1, &mTexture);
 	glBindTexture(GL_TEXTURE_2D, mTexture);
